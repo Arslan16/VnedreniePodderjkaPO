@@ -64,8 +64,13 @@ class MainWindow(QMainWindow):
             self.notification_label.setText("Ошибка при добавлении пользователяы!")
     
     def show_user_list(self, limit: int = 5):
+        """
+        Показывает последних 5 пользователей из кэша\n
+        Если пользователей меньше 5 то извлекает часть из базы данных\n
+        Причем из базы данных извлекаются те пользователи, которых не было в кэше
+        """
         try:
-            users: list[str] = redis_client.lrange('users', -1, -5)
+            users: list[str] = redis_client.lrange('users', -5, -1)
             if users is None:
                 users = []
             else:
@@ -88,7 +93,7 @@ class MainWindow(QMainWindow):
                 users = users[0:limit]
             self.text_field.clear()
             self.text_field.setText(
-                "\n".join(users)
+                "\n".join(reversed(users))
             )
         except Exception as exc:
             print(exc)
