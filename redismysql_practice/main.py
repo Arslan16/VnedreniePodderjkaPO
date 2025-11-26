@@ -65,7 +65,7 @@ class MainWindow(QMainWindow):
     
     def show_user_list(self, limit: int = 5):
         try:
-            users: list[str] = redis_client.lrange('users', 0, -1)
+            users: list[str] = redis_client.lrange('users', -1, -5)
             if users is None:
                 users = []
             else:
