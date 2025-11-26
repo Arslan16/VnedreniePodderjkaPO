@@ -70,15 +70,16 @@ class MainWindow(QMainWindow):
         Причем из базы данных извлекаются те пользователи, которых не было в кэше
         """
         try:
+            # Извлекаем последние 5 значений списка
             users: list[str] = redis_client.lrange('users', -5, -1)
             if users is None:
-                users = []
+                users: list = []
             else:
-                users = [usr.decode() for usr in users]
-            # Извлекаем последние 5 значений списка
+                users: list[str] = [usr.decode() for usr in users]
+            # Если нет 5 пользователей, то извлекаем из базы, сколько не хватает
             if len(users) < limit:
                 with app_sessionmaker() as session:
-                    need_users = limit - len(users)
+                    need_users: int = limit - len(users)
                     stmt: Select = select(
                         User.name
                     ).where(
@@ -90,7 +91,7 @@ class MainWindow(QMainWindow):
                     for user in result:
                         users.append(user)
             else:
-                users = users[0:limit]
+                users: list[str] = users[0:limit]
             self.text_field.clear()
             self.text_field.setText(
                 "\n".join(reversed(users))
