@@ -1,0 +1,35 @@
+services:
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    environment:
+      - "MSSQL_SA_PASSWORD=123AbcD##"
+      - "ACCEPT_EULA=Y"
+    ports:
+      - "1433:1433"
+
+  mssql-exporter:
+    image: awaragi/prometheus-mssql-exporter:latest
+    environment:
+      - "SERVER=mssql"
+      - "USERNAME=sa"
+      - "PASSWORD=123AbcD##"
+      - "PORT=1433"
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mssql
+
+  prometheus:
+    image: prom/prometheus:latest
+    environment:
+      - "PROMETHEUS_SCRAPE_INTERVAL=15s"
+      - "PROMETHEUS_EVALUATION_INTERVAL=15s"
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+    depends_on:
+      - mssql-exporter
+    ports:
+      - "9090:9090"
+  
+
