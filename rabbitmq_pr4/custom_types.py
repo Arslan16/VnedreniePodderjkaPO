@@ -113,19 +113,6 @@ class RabbitMQManager:
         self.channel = await self.connection.channel()
         return self
 
-    async def register_callback_on_queue(
-        self,
-        queue_name: str,
-        callback: Callable,
-        durable: bool = True
-    ) -> aio_pika.queue.ConsumerTag:
-        if not self.channel:
-            raise RuntimeError("Не подключён канал")
-
-        queue = await self.channel.declare_queue(queue_name, durable=durable)
-        print(f"Callback {callback.__name__} зарегистрирован на очередь {queue_name}")
-        return await queue.consume(callback)
-
     async def close(self):
         if self.channel and not self.channel.is_closed:
             await self.channel.close()
